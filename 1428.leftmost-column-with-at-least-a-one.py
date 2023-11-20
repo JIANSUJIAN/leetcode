@@ -29,31 +29,53 @@
 
 # Approach 2: Binary Search
 # Time: O(MlogN) Sapce: O(1)
-# class Solution:
-#     def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -> int:
-#         rows, cols = binaryMatrix.dimensions()
-#         smallest_index = cols
+# See editorial:  we use the lower-middle
+# https://labuladong.github.io/algo/di-yi-zhan-da78c/shou-ba-sh-48c1d/wo-xie-le--9c7a4/
+# See above: left_bound
 
-#         for row in range(rows):
-#             lo = 0
-#             hi = cols - 1
+class Solution:
+    def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -> int:
+        rows, cols = binaryMatrix.dimensions()
+        smallest_index = cols
 
-#             while lo < hi:
-#                 mid = (hi + lo) // 2
-#                 if binaryMatrix.get(row, mid) == 0:
-#                     lo = mid + 1
-#                 else:
-#                     hi = mid
-#             if binaryMatrix.get(row, lo) == 1:
-#                 smallest_index = min(smallest_index, lo)
+        for row in range(rows):
+            lo = 0
+            hi = cols - 1
+
+            while lo < hi:
+                mid = (hi + lo) // 2
+                if binaryMatrix.get(row, mid) == 0:
+                    lo = mid + 1
+                else:
+                    hi = mid
+            if binaryMatrix.get(row, lo) == 1:
+                smallest_index = min(smallest_index, lo)
         
-#         return -1 if smallest_index == cols else smallest_index
+        return -1 if smallest_index == cols else smallest_index
 
         
 # Approach 3: Start at Top Right, Move Only Left and Down
 
-class Solution:
-    def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -> int:
+
+# class Solution:
+#     def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -> int:
+
+#         rows, cols = binaryMatrix.dimensions()
+
+#         # Set pointers to the top-right corner
+#         current_row = 0
+#         current_col = cols - 1
+
+#         while current_row < rows and current_col >= 0:
+#             if binaryMatrix.get(current_row, current_col) == 0:
+#                 current_row += 1
+#             else:
+#                 current_col -= 1
+        
+#         if current_col != cols - 1:
+#             return current_col + 1
+#         else:
+#             return -1
 
 # @lc code=end
 
