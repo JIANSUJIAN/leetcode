@@ -12,50 +12,88 @@ class TreeNode:
         self.left = left
         self.right = right
 
+# Approach 1: Linear Time
+# Time: O(N) 
+# Space: O(d) = O(logN) to keep the recursion stack, where d is the tree depth
+# class Solution:
+#     def countNodes(self, root: Optional[TreeNode]) -> int:
+#         if not root:
+#             return 0
+#         else:
+#             return 1 + self.countNodes(root.right) + self.countNodes(root.left)
+
+# Approach 2: Binary search
+# Time: O(d^2) = O(log^2(N))
+# Space: O(1)
+
 class Solution:
+    def count_depth(self, node: TreeNode) -> int:
+        """
+        Return the tree depth in O(d) time
+        """
+        d = 0
+        while node.left:
+            d += 1
+            node = node.left
+        return d
+    
+    def exist(self, idx: int, d: int, node: TreeNode) -> bool:
+        """
+        Last level nodes are enumerated from 0 to 2**d - 1 (left -> right).
+        Return True if last level node idx exists.
+        Binary search with O(d) complexity. 
+        """
+
+        left, right = 0, 2**d - 1
+        for _ in range(d):
+            pivot = left + (right - left) // 2
+            if idx <= pivot:
+                # Move right boundary to pivot. Since nodes are filled from left to right,
+                # if a node at 'pivot' index doesn't exist, no nodes exist to its right.
+                right = pivot
+                node = node.left
+            else:
+                # Move left boundary to 'pivot + 1' to narrow the search to the right half.
+                # This avoids redundancy and ensures the search progresses correctly.
+                left = pivot + 1
+                node = node.right
+        return True if node else False
+    
+
     def countNodes(self, root: Optional[TreeNode]) -> int:
-        # Initialize pointers l and r at the root.
-        l = root 
-        r = root
-        # hl will store the height of the left subtree, and hr the height of the right subtree.
-        hl = 0
-        hr = 0
+
+        # If the tree is empty
+        if not root:
+            return 0
         
-        # Traverse the leftmost path of the tree to compute its height (hl).
-        while l is not None:
-            l = l.left
-            hl += 1
+        # If the tree contains 1 node
+        d = self.count_depth(root)
+        if d == 0:
+            return 1
         
-        # Traverse the rightmost path of the tree to compute its height (hr).
-        while r is not None:
-            r = r.right
-            hr += 1
+        # Last level nodes are enumerated from 0 to 2**d - 1 (left -> right).
+        # Perform binary search to check how many nodes exist.
+        left, right = 1, 2**d - 1
+        while left <= right:
+            pivot = left + (right - left) // 2
+            if self.exist(pivot, d, root):
+                # If node exists at 'pivot', continue search in the right half
+                left = pivot + 1
+            else:
+                # If node does not exist at 'pivot', continue search in the left half
+                right = pivot - 1
         
-        # If the height of the left and right subtrees are equal, the tree is full.
-        # Therefore, the number of nodes is 2^hl - 1.
-        if hl == hr:
-            return pow(2, hl) - 1
-        
-        # If the tree isn't full, recursively compute the number of nodes in the left and right subtrees.
-        # Add 1 for the root node.
-        return 1 + self.countNodes(root.left) + self.countNodes(root.right)
+        # The tree contains 2**d - 1 nodes on the first (d - 1) levels
+        # and `left` nodes on the last level.
+        return (2**d - 1) + left
 
 
-# The function `countNodes` attempts to determine the number of nodes in a complete binary tree. The methodology used is to check if the tree is a perfect binary tree (where the left and right subtree heights are the same) or if it's just complete.
+                
 
-# 1. **Finding the height of the tree**:
-#     - The code first calculates the height of the tree using the leftmost and rightmost paths. This is done by traversing down the left and right sides of the tree.
-#     - For a balanced binary tree, this takes \(O(\log n)\) time for the left side and \(O(\log n)\) time for the right side.
-#     - So, combined, the time taken for height calculation is \(2 \times O(\log n) = O(\log n)\).
 
-# 2. **Recursive Decomposition**:
-#     - If the tree is found to be perfect (where left and right subtree heights are the same), the total number of nodes is calculated directly using \(2^{\text{height}} - 1\). This takes constant time, i.e., \(O(1)\).
-#     - If the tree is not perfect, then the function dives deeper into both left and right subtrees. The key observation here is that at each recursive call, one of the two subtrees will be a perfect binary tree (because the tree is complete but not perfect). Thus, we don't have to make two recursive calls at each level.
-#     - This means that, in the worst case, the function will make a recursive call down each level of the tree, which is \(O(\log n)\) levels deep.
-#     - In each of these recursive calls, the height calculation is made again, costing another \(O(\log n)\).
-#     - This results in \(O(\log n) \times O(\log n) = O((\log n)^2)\) for the recursive decomposition.
 
-# Combining both the height calculation and the recursive decomposition, the total time complexity of the function is \(O((\log n)^2)\).
-        
+
+
+
 # @lc code=end
 

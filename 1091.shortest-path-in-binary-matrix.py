@@ -42,6 +42,9 @@ class Solution:
             pathLen += 1
         return -1
 
+# Approach 2: A* (Advanced)
+
+
 
         
 
